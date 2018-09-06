@@ -3,4 +3,4 @@
 
 Latest progress:
 
-![Last render][output.png]
+<img src="output.png" width="800" />
