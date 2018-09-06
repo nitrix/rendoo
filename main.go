@@ -18,10 +18,7 @@ func main() {
 	width, height := 800, 800
 	img := newImage(width, height, colors["black"])
 
-	obj, err := loadObjFromFile("african_head.obj")
-	// obj, err := loadObjFromFile("deer.obj")
-	// obj, err := loadObjFromFile("neptune.obj")
-	// obj, err := loadObjFromFile("food.obj")
+	obj, err := loadObjFromFile("models/african_head.obj")
 	if err != nil {
 		log.Fatalln("Unable to load obj file:", err)
 	}
