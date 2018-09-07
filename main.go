@@ -37,7 +37,6 @@ func drawSolidShadingWithZBuffer(img *image.RGBA, obj *Obj) {
 	width := rect.Dx()
 	height := rect.Dy()
 
-	lightSource := Vertex{0, 0, -1}
 	zBuffer := make([]float64, width*height)
 	for i := 0; i < len(zBuffer); i++ {
 		zBuffer[i] = -1.0
@@ -56,15 +55,15 @@ func drawSolidShadingWithZBuffer(img *image.RGBA, obj *Obj) {
 			screenCoordinates[i].Y = int(y)
 		}
 
-		faceNormal := face.Normal()
-		faceNormal.normalize(1.0)
-		intensity := faceNormal.X * lightSource.X + faceNormal.Y * lightSource.Y + faceNormal.Z * lightSource.Z
-
-		// Back face culling if the intensity of the light is negative (light is coming from behind the face)
-		if intensity > 0 {
-			// drawFilledTriangle(img, screenCoordinates[0], screenCoordinates[1], screenCoordinates[2], color.RGBA{uint8(intensity * 255), uint8(intensity * 255), uint8(intensity * 255), 255})
-			drawFilledTriangleZBuffer(img, screenCoordinates[0], screenCoordinates[1], screenCoordinates[2], zBuffer, face, color.RGBA{uint8(intensity * 255), uint8(intensity * 255), uint8(intensity * 255), 255})
-		}
+		// drawFilledTriangle(img, screenCoordinates[0], screenCoordinates[1], screenCoordinates[2], color.RGBA{uint8(intensity * 255), uint8(intensity * 255), uint8(intensity * 255), 255})
+		drawFilledTriangleZBuffer(
+			img,
+			screenCoordinates[0],
+			screenCoordinates[1],
+			screenCoordinates[2],
+			zBuffer,
+			face,
+		)
 	}
 }
 
