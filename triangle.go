@@ -39,7 +39,7 @@ func drawFilledTriangle(img *image.RGBA, v1, v2, v3 Point, c color.Color) {
 	}
 }
 
-func drawFilledTriangleZBuffer(img *image.RGBA, v1, v2, v3 Point, zBuffer []float64, face Face) {
+func drawFilledTriangleZBuffer(img *image.RGBA, v1, v2, v3 Point, zBuffer []float64, texture image.Image, face Face) {
 	width := img.Bounds().Dx()
 
 	lightSource := Vertex{0, 0, 1}
@@ -61,6 +61,13 @@ func drawFilledTriangleZBuffer(img *image.RGBA, v1, v2, v3 Point, zBuffer []floa
 				}
 				normal.normalize(1.0)
 
+				// Texture coordinate
+				txs := w1 * face.Textures[0].X + w2 * face.Textures[1].X + w3 * face.Textures[2].X
+				tys := w1 * face.Textures[0].Y + w2 * face.Textures[1].Y + w3 * face.Textures[2].Y
+				tx := int(txs * float64(texture.Bounds().Max.X))
+				ty := int(float64(texture.Bounds().Max.Y) - tys * float64(texture.Bounds().Max.Y)) // Flip vertically!
+				tcolor := texture.At(tx, ty)
+
 				// Calculate light intensity
 				intensity := normal.X * lightSource.X + normal.Y * lightSource.Y + normal.Z * lightSource.Z
 
@@ -71,7 +78,13 @@ func drawFilledTriangleZBuffer(img *image.RGBA, v1, v2, v3 Point, zBuffer []floa
 				// Drawing according to Z-buffer
 				if zBuffer[width*y+x] < z {
 					zBuffer[width*y+x] = z
-					c := color.RGBA{R: uint8(intensity * 255), G: uint8(intensity * 255), B: uint8(intensity * 255), A: 255}
+					r, g, b, _ := tcolor.RGBA()
+					c := color.RGBA{
+						R: uint8(float64(uint8(r)) * intensity),
+						G: uint8(float64(uint8(g)) * intensity),
+						B: uint8(float64(uint8(b)) * intensity),
+						A: uint8(255),
+					}
 					img.Set(x, y, c)
 				}
 			}

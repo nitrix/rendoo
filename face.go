@@ -2,6 +2,7 @@ package main
 
 type Face struct {
 	Vertices [3]*Vertex
+	Textures [3]*Vertex
 	Normals [3]*Vertex
 }
 

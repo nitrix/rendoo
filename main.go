@@ -3,7 +3,9 @@ package main
 import (
 	"image"
 	"image/color"
+	"image/png"
 	"log"
+	"os"
 )
 
 func absInt(n int) int {
@@ -23,16 +25,25 @@ func main() {
 		log.Fatalln("Unable to load obj file:", err)
 	}
 
+	textureFile, err := os.Open("textures/african_head_diffuse.png")
+	if err != nil {
+		log.Fatalln("Unable to read texture from file:", err)
+	}
+	texture, err := png.Decode(textureFile)
+	if err != nil {
+		log.Fatalln("Unable to decode texture:", err)
+	}
+
 	// drawWireframe(img, obj)
 	// drawSolid(img, obj)
 	// drawSolidShading(img, obj)
-	drawSolidShadingWithZBuffer(img, obj)
+	drawSolidShadingWithZBuffer(img, obj, texture)
 
 	img = flipImageVertically(img)
 	saveImage(img)
 }
 
-func drawSolidShadingWithZBuffer(img *image.RGBA, obj *Obj) {
+func drawSolidShadingWithZBuffer(img *image.RGBA, obj *Obj, texture image.Image) {
 	rect := img.Bounds()
 	width := rect.Dx()
 	height := rect.Dy()
@@ -62,6 +73,7 @@ func drawSolidShadingWithZBuffer(img *image.RGBA, obj *Obj) {
 			screenCoordinates[1],
 			screenCoordinates[2],
 			zBuffer,
+			texture,
 			face,
 		)
 	}

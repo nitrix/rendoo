@@ -12,6 +12,7 @@ import (
 type Obj struct {
 	vertices []*Vertex
 	normals  []*Vertex
+	textures []*Vertex
 	Faces    []Face
 }
 
@@ -46,6 +47,12 @@ func loadObjFromFile(filename string) (*Obj, error) {
 		// Vertex normal line
 		case "vn":
 			if err := obj.parseVertexNormalLine(line, lineNumber); err != nil {
+				return nil, err
+			}
+
+		// Vertex texture line
+		case "vt":
+			if err := obj.parseVertexTextureLine(line, lineNumber); err != nil {
 				return nil, err
 			}
 
@@ -84,11 +91,19 @@ func (obj *Obj) parseFaceLine(line string, lineNumber int) error {
 	if err != nil {
 		return err
 	}
+	vertexTextureId, err := strconv.Atoi(firstArgs[1])
+	if err != nil {
+		return err
+	}
 	vertexNormalId, err := strconv.Atoi(firstArgs[2])
 	if err != nil {
 		return err
 	}
 	firstVertex, err := obj.resolveVertexId(vertexId, lineNumber)
+	if err != nil {
+		return err
+	}
+	firstVertexTexture, err := obj.resolveVertexTextureId(vertexTextureId, lineNumber)
 	if err != nil {
 		return err
 	}
@@ -103,11 +118,19 @@ func (obj *Obj) parseFaceLine(line string, lineNumber int) error {
 	if err != nil {
 		return err
 	}
+	vertexTextureId, err = strconv.Atoi(secondArgs[1])
+	if err != nil {
+		return err
+	}
 	vertexNormalId, err = strconv.Atoi(secondArgs[2])
 	if err != nil {
 		return err
 	}
 	secondVertex, err := obj.resolveVertexId(vertexId, lineNumber)
+	if err != nil {
+		return err
+	}
+	secondVertexTexture, err := obj.resolveVertexTextureId(vertexTextureId, lineNumber)
 	if err != nil {
 		return err
 	}
@@ -122,11 +145,19 @@ func (obj *Obj) parseFaceLine(line string, lineNumber int) error {
 	if err != nil {
 		return err
 	}
+	vertexTextureId, err = strconv.Atoi(thirdArgs[1])
+	if err != nil {
+		return err
+	}
 	vertexNormalId, err = strconv.Atoi(thirdArgs[2])
 	if err != nil {
 		return err
 	}
 	thirdVertex, err := obj.resolveVertexId(vertexId, lineNumber)
+	if err != nil {
+		return err
+	}
+	thirdVertexTexture, err := obj.resolveVertexTextureId(vertexTextureId, lineNumber)
 	if err != nil {
 		return err
 	}
@@ -140,6 +171,11 @@ func (obj *Obj) parseFaceLine(line string, lineNumber int) error {
 			firstVertex,
 			secondVertex,
 			thirdVertex,
+		},
+		Textures: [3]*Vertex{
+			firstVertexTexture,
+			secondVertexTexture,
+			thirdVertexTexture,
 		},
 		Normals: [3]*Vertex{
 			firstVertexNormal,
@@ -163,6 +199,13 @@ func (obj *Obj) resolveVertexNormalId(id int, lineNumber int) (*Vertex, error) {
 		return nil, errors.New(fmt.Sprintf("unable to resolve vertex normal id %d used on line %d", id, lineNumber))
 	}
 	return obj.normals[id-1], nil
+}
+
+func (obj *Obj) resolveVertexTextureId(id int, lineNumber int) (*Vertex, error) {
+	if id > len(obj.textures) {
+		return nil, errors.New(fmt.Sprintf("unable to resolve vertex texture id %d used on line %d", id, lineNumber))
+	}
+	return obj.textures[id-1], nil
 }
 
 func (obj *Obj) parseVertexLine(line string, lineNumber int) error {
@@ -243,6 +286,47 @@ func (obj *Obj) parseVertexNormalLine(line string, lineNumber int) error {
 	}
 
 	obj.normals = append(obj.normals, &vertexNormal)
+
+	return nil
+}
+
+func (obj *Obj) parseVertexTextureLine(line string, lineNumber int) error {
+	vertexTexture := Vertex{}
+
+	parts := strings.Split(line, " ")
+
+	if len(parts) < 4 {
+		return errors.New(fmt.Sprintf("insufficient points found in vertex texture directive on line %d", lineNumber))
+	}
+
+	// Remove empty parts
+	for k, v := range parts {
+		if v == "" {
+			parts = append(parts[:k], parts[k+1:]...)
+		}
+	}
+
+	var err error
+
+	// X
+	vertexTexture.X, err = strconv.ParseFloat(parts[1], 64)
+	if err != nil {
+		return errors.New(fmt.Sprintf("invalid float x coordinate found in vertex texture directive on line %d", lineNumber))
+	}
+
+	// Y
+	vertexTexture.Y, err = strconv.ParseFloat(parts[2], 64)
+	if err != nil {
+		return errors.New(fmt.Sprintf("invalid float y coordinate found in vertex texture directive on line %d", lineNumber))
+	}
+
+	// Z
+	vertexTexture.Z, err = strconv.ParseFloat(parts[3], 64)
+	if err != nil {
+		return errors.New(fmt.Sprintf("invalid float z coordinate found in vertex texture directive on line %d", lineNumber))
+	}
+
+	obj.textures = append(obj.textures, &vertexTexture)
 
 	return nil
 }
