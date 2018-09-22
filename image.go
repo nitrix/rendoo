@@ -9,7 +9,7 @@ import (
 )
 
 func saveImage(img image.Image) {
-	output, err := os.OpenFile("output.png", os.O_CREATE | os.O_WRONLY, 0777)
+	output, err := os.OpenFile("output.png", os.O_CREATE|os.O_WRONLY, 0777)
 	if err != nil {
 		log.Fatalln("Unable to open output file:", err)
 	}
@@ -37,7 +37,7 @@ func flipImageVertically(rect image.Rectangle, img image.Image) *image.RGBA {
 
 	for x := 0; x < rect.Max.X; x++ {
 		for y := 0; y < rect.Max.Y; y++ {
-			rgba.Set(x, rect.Max.Y - y, img.At(x, y))
+			rgba.Set(x, rect.Max.Y-y, img.At(x, y))
 		}
 	}
 
