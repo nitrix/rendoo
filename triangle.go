@@ -12,7 +12,7 @@ type Triangle struct {
 func drawTriangle(img *image.RGBA, triangle Triangle, zBuffer []float64, texture image.Image, face Face) {
 	width := img.Bounds().Dx()
 
-	lightSource := Vertex{0, 0, 1}
+	lightSource := Vertex4{0, 0, 1, 0}
 
 	v1 := triangle.points[0]
 	v2 := triangle.points[1]
@@ -30,7 +30,7 @@ func drawTriangle(img *image.RGBA, triangle Triangle, zBuffer []float64, texture
 				depth := w1 * face.Vertices[0].Z + w2 * face.Vertices[1].Z + w3 * face.Vertices[2].Z
 
 				// Interpolate normal based on barycentric weights
-				normal := Vertex {
+				normal := Vertex4{
 					X: w1 * face.Normals[0].X + w2 * face.Normals[1].X + w3 * face.Normals[2].X,
 					Y: w1 * face.Normals[0].Y + w2 * face.Normals[1].Y + w3 * face.Normals[2].Y,
 					Z: w1 * face.Normals[0].Z + w2 * face.Normals[1].Z + w3 * face.Normals[2].Z,
