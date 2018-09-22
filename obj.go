@@ -10,10 +10,11 @@ import (
 )
 
 type Obj struct {
-	vertices []*Vertex
-	normals  []*Vertex
-	textures []*Vertex
 	Faces    []Face
+
+	vertices []Vertex
+	normals  []Vertex
+	textures []Vertex
 }
 
 func loadObjFromFile(filename string) (*Obj, error) {
@@ -67,6 +68,11 @@ func loadObjFromFile(filename string) (*Obj, error) {
 	if err := scanner.Err(); err != nil {
 		return nil, err
 	}
+
+	// Cleanup
+	obj.vertices = []Vertex{}
+	obj.normals = []Vertex{}
+	obj.textures = []Vertex{}
 
 	return &obj, nil
 }
@@ -167,17 +173,17 @@ func (obj *Obj) parseFaceLine(line string, lineNumber int) error {
 	}
 
 	obj.Faces = append(obj.Faces, Face{
-		Vertices: [3]*Vertex{
+		Vertices: [3]Vertex{
 			firstVertex,
 			secondVertex,
 			thirdVertex,
 		},
-		Textures: [3]*Vertex{
+		Textures: [3]Vertex{
 			firstVertexTexture,
 			secondVertexTexture,
 			thirdVertexTexture,
 		},
-		Normals: [3]*Vertex{
+		Normals: [3]Vertex{
 			firstVertexNormal,
 			secondVertexNormal,
 			thirdVertexNormal,
@@ -187,23 +193,23 @@ func (obj *Obj) parseFaceLine(line string, lineNumber int) error {
 	return nil
 }
 
-func (obj *Obj) resolveVertexId(id int, lineNumber int) (*Vertex, error) {
+func (obj *Obj) resolveVertexId(id int, lineNumber int) (Vertex, error) {
 	if id > len(obj.vertices) {
-		return nil, errors.New(fmt.Sprintf("unable to resolve vertex id %d used on line %d", id, lineNumber))
+		return Vertex{}, errors.New(fmt.Sprintf("unable to resolve vertex id %d used on line %d", id, lineNumber))
 	}
 	return obj.vertices[id-1], nil
 }
 
-func (obj *Obj) resolveVertexNormalId(id int, lineNumber int) (*Vertex, error) {
+func (obj *Obj) resolveVertexNormalId(id int, lineNumber int) (Vertex, error) {
 	if id > len(obj.normals) {
-		return nil, errors.New(fmt.Sprintf("unable to resolve vertex normal id %d used on line %d", id, lineNumber))
+		return Vertex{}, errors.New(fmt.Sprintf("unable to resolve vertex normal id %d used on line %d", id, lineNumber))
 	}
 	return obj.normals[id-1], nil
 }
 
-func (obj *Obj) resolveVertexTextureId(id int, lineNumber int) (*Vertex, error) {
+func (obj *Obj) resolveVertexTextureId(id int, lineNumber int) (Vertex, error) {
 	if id > len(obj.textures) {
-		return nil, errors.New(fmt.Sprintf("unable to resolve vertex texture id %d used on line %d", id, lineNumber))
+		return Vertex{}, errors.New(fmt.Sprintf("unable to resolve vertex texture id %d used on line %d", id, lineNumber))
 	}
 	return obj.textures[id-1], nil
 }
@@ -244,7 +250,7 @@ func (obj *Obj) parseVertexLine(line string, lineNumber int) error {
 		return errors.New(fmt.Sprintf("invalid float z coordinate found in vertex directive on line %d", lineNumber))
 	}
 
-	obj.vertices = append(obj.vertices, &vertex)
+	obj.vertices = append(obj.vertices, vertex)
 
 	return nil
 }
@@ -285,7 +291,7 @@ func (obj *Obj) parseVertexNormalLine(line string, lineNumber int) error {
 		return errors.New(fmt.Sprintf("invalid float z coordinate found in vertex normal directive on line %d", lineNumber))
 	}
 
-	obj.normals = append(obj.normals, &vertexNormal)
+	obj.normals = append(obj.normals, vertexNormal)
 
 	return nil
 }
@@ -326,7 +332,7 @@ func (obj *Obj) parseVertexTextureLine(line string, lineNumber int) error {
 		return errors.New(fmt.Sprintf("invalid float z coordinate found in vertex texture directive on line %d", lineNumber))
 	}
 
-	obj.textures = append(obj.textures, &vertexTexture)
+	obj.textures = append(obj.textures, vertexTexture)
 
 	return nil
 }
