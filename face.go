@@ -1,5 +1,7 @@
 package main
 
+import "image"
+
 type Face struct {
 	Vertices [3]Vertex
 	Textures [3]Vertex
@@ -13,7 +15,7 @@ type Face struct {
 // Basically, for a given point P, we're finding weights that tell us how much of P's X coordinate is made of V1, V2, and V3, and also the same for P's Y coordinate.
 // With a lot of re-arranging, we can solve Wv1, Wv2 and Wv3.
 // Another thing about barycentric coordinates, is that if P is actually outside of the triangle, then at least one of W1, W2, or W3 will be negative!
-func barycentric(pt, p1, p2, p3 Point) (float64, float64, float64) {
+func barycentric(pt, p1, p2, p3 image.Point) (float64, float64, float64) {
 	p  := Vertex{X: float64(pt.X), Y: float64(pt.Y)}
 	v1 := Vertex{X: float64(p1.X), Y: float64(p1.Y)}
 	v2 := Vertex{X: float64(p2.X), Y: float64(p2.Y)}

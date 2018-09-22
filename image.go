@@ -20,23 +20,27 @@ func saveImage(img image.Image) {
 	}
 }
 
-func newImage(width, height int) *image.RGBA {
-	img := image.NewRGBA(image.Rectangle{Max: image.Point{X: width, Y: height}})
-	for x := 0; x < width; x++ {
-		for y := 0; y < height; y++ {
+func newImage(rect image.Rectangle) *image.RGBA {
+	img := image.NewRGBA(rect)
+	for x := 0; x < rect.Max.X; x++ {
+		for y := 0; y < rect.Max.Y; y++ {
 			img.Set(x, y, color.RGBA{R: 0, G: 0, B: 0, A: 0})
 		}
 	}
 	return img
 }
 
-func flipImageVertically(img *image.RGBA) *image.RGBA {
-	bounds := img.Bounds()
-	rgba := newImage(bounds.Max.X, bounds.Max.Y)
-	for x := 0; x < bounds.Max.X; x++ {
-		for y := 0; y < bounds.Max.Y; y++ {
-			rgba.Set(x, bounds.Max.Y - y, img.At(x, y))
+func flipImageVertically(rect image.Rectangle, img image.Image) *image.RGBA {
+	rgba := newImage(rect)
+
+	// draw.Draw(rgba, rect, img, rect.Min, draw.Src)
+
+	for x := 0; x < rect.Max.X; x++ {
+		for y := 0; y < rect.Max.Y; y++ {
+			rgba.Set(x, rect.Max.Y - y, img.At(x, y))
 		}
 	}
+
+
 	return rgba
 }
