@@ -11,8 +11,9 @@ type Triangle struct {
 
 func drawTriangle(img *image.RGBA, triangle Triangle, zBuffer []float64, texture image.Image, face Face) {
 	width := img.Bounds().Dx()
+	height := img.Bounds().Dy()
 
-	lightSource := Vertex4{0, 0, 1, 0}
+	lightSource := Vertex3{0, 0, 1}
 
 	v1 := triangle.points[0]
 	v2 := triangle.points[1]
@@ -20,32 +21,40 @@ func drawTriangle(img *image.RGBA, triangle Triangle, zBuffer []float64, texture
 
 	min, max := boundingBox(v1, v2, v3)
 	for x := min.X; x <= max.X; x++ {
+		if x < 0 || x >= width {
+			break
+		}
+
 		for y := min.Y; y <= max.Y; y++ {
-			p := image.Point{X:x, Y: y}
+			if y < 0 || y >= height {
+				break
+			}
+
+			p := image.Point{X: x, Y: y}
 			w1, w2, w3 := barycentric(p, v1, v2, v3)
 
 			// If point in triangle
-			if w1 >= 0 && w1 <= 1 && w2 >= 0 && w2 <= 1 && w1 + w2 <= 1 {
+			if w1 >= 0 && w1 <= 1 && w2 >= 0 && w2 <= 1 && w1+w2 <= 1 {
 				// Interpolate depth based on barycentric weights
-				depth := w1 * face.Vertices[0].Z + w2 * face.Vertices[1].Z + w3 * face.Vertices[2].Z
+				depth := w1*face.Vertices[0].Z + w2*face.Vertices[1].Z + w3*face.Vertices[2].Z
 
 				// Interpolate normal based on barycentric weights
-				normal := Vertex4{
-					X: w1 * face.Normals[0].X + w2 * face.Normals[1].X + w3 * face.Normals[2].X,
-					Y: w1 * face.Normals[0].Y + w2 * face.Normals[1].Y + w3 * face.Normals[2].Y,
-					Z: w1 * face.Normals[0].Z + w2 * face.Normals[1].Z + w3 * face.Normals[2].Z,
+				normal := Vertex3{
+					X: w1*face.Normals[0].X + w2*face.Normals[1].X + w3*face.Normals[2].X,
+					Y: w1*face.Normals[0].Y + w2*face.Normals[1].Y + w3*face.Normals[2].Y,
+					Z: w1*face.Normals[0].Z + w2*face.Normals[1].Z + w3*face.Normals[2].Z,
 				}
 				normal.normalize(1.0)
 
 				// Interpolate texture based on barycentric weights
-				txs := w1 * face.Textures[0].X + w2 * face.Textures[1].X + w3 * face.Textures[2].X
-				tys := w1 * face.Textures[0].Y + w2 * face.Textures[1].Y + w3 * face.Textures[2].Y
+				txs := w1*face.Textures[0].X + w2*face.Textures[1].X + w3*face.Textures[2].X
+				tys := w1*face.Textures[0].Y + w2*face.Textures[1].Y + w3*face.Textures[2].Y
 				tx := int(txs * float64(texture.Bounds().Max.X))
 				ty := int(tys * float64(texture.Bounds().Max.Y))
 				tcolor := texture.At(tx, ty)
 
 				// Calculate light intensity
-				intensity := normal.X * lightSource.X + normal.Y * lightSource.Y + normal.Z * lightSource.Z
+				intensity := normal.X*lightSource.X + normal.Y*lightSource.Y + normal.Z*lightSource.Z
 
 				if intensity < 0 {
 					continue
