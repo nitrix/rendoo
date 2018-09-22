@@ -33,14 +33,11 @@ func newImage(rect image.Rectangle) *image.RGBA {
 func flipImageVertically(rect image.Rectangle, img image.Image) *image.RGBA {
 	rgba := newImage(rect)
 
-	// draw.Draw(rgba, rect, img, rect.Min, draw.Src)
-
 	for x := 0; x < rect.Max.X; x++ {
 		for y := 0; y < rect.Max.Y; y++ {
 			rgba.Set(x, rect.Max.Y - y, img.At(x, y))
 		}
 	}
-
 
 	return rgba
 }
