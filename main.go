@@ -9,23 +9,18 @@ import (
 	"time"
 )
 
-func absInt(n int) int {
-	if n < 0 {
-		return n * -1
-	} else {
-		return n
-	}
-}
-
 func main() {
+	// Output image
 	rect := image.Rectangle{Max: image.Point{X: 800, Y: 800}}
 	img := newImage(rect)
 
+	// Mesh
 	obj, err := loadObjFromFile("models/african_head.obj")
 	if err != nil {
 		log.Fatalln("Unable to load obj file:", err)
 	}
 
+	// Texture
 	textureFile, err := os.Open("textures/african_head_diffuse.png")
 	if err != nil {
 		log.Fatalln("Unable to read texture from file:", err)
@@ -34,9 +29,9 @@ func main() {
 	if err != nil {
 		log.Fatalln("Unable to decode texture:", err)
 	}
-
 	texture = flipImageVertically(texture.Bounds(), texture)
 
+	// Render
 	now := time.Now()
 	fps := 0
 	for time.Since(now) <= time.Second {
@@ -45,6 +40,7 @@ func main() {
 	}
 	fmt.Println("FPS:", fps)
 
+	// Saving
 	img = flipImageVertically(rect, img)
 	saveImage(img)
 }

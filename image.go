@@ -22,11 +22,13 @@ func saveImage(img image.Image) {
 
 func newImage(rect image.Rectangle) *image.RGBA {
 	img := image.NewRGBA(rect)
+
 	for x := 0; x < rect.Max.X; x++ {
 		for y := 0; y < rect.Max.Y; y++ {
 			img.Set(x, y, color.RGBA{R: 0, G: 0, B: 0, A: 255})
 		}
 	}
+
 	return img
 }
 
