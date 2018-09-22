@@ -2,7 +2,6 @@ package main
 
 import (
 	"image"
-	"image/color"
 	"image/png"
 	"log"
 	"os"
@@ -18,7 +17,7 @@ func absInt(n int) int {
 
 func main() {
 	width, height := 800, 800
-	img := newImage(width, height, colors["black"])
+	img := newImage(width, height)
 
 	obj, err := loadObjFromFile("models/african_head.obj")
 	if err != nil {
@@ -34,16 +33,13 @@ func main() {
 		log.Fatalln("Unable to decode texture:", err)
 	}
 
-	// drawWireframe(img, obj)
-	// drawSolid(img, obj)
-	// drawSolidShading(img, obj)
-	drawSolidShadingWithZBuffer(img, obj, texture)
+	render(img, obj, texture)
 
 	img = flipImageVertically(img)
 	saveImage(img)
 }
 
-func drawSolidShadingWithZBuffer(img *image.RGBA, obj *Obj, texture image.Image) {
+func render(img *image.RGBA, obj *Obj, texture image.Image) {
 	rect := img.Bounds()
 	width := rect.Dx()
 	height := rect.Dy()
@@ -54,7 +50,7 @@ func drawSolidShadingWithZBuffer(img *image.RGBA, obj *Obj, texture image.Image)
 	}
 
 	for _, face := range obj.Faces {
-		screenCoordinates := [3]Point{}
+		triangle := Triangle{}
 
 		for i := 0; i < 3; i++ {
 			vertex := face.Vertices[i]
@@ -62,92 +58,16 @@ func drawSolidShadingWithZBuffer(img *image.RGBA, obj *Obj, texture image.Image)
 			x := (vertex.X + 1.0) * float64(width - 1) / 2
 			y := (vertex.Y + 1.0) * float64(height - 1) / 2
 
-			screenCoordinates[i].X = int(x)
-			screenCoordinates[i].Y = int(y)
+			triangle.points[i].X = int(x)
+			triangle.points[i].Y = int(y)
 		}
 
-		// drawFilledTriangle(img, screenCoordinates[0], screenCoordinates[1], screenCoordinates[2], color.RGBA{uint8(intensity * 255), uint8(intensity * 255), uint8(intensity * 255), 255})
-		drawFilledTriangleZBuffer(
+		drawTriangle(
 			img,
-			screenCoordinates[0],
-			screenCoordinates[1],
-			screenCoordinates[2],
+			triangle,
 			zBuffer,
 			texture,
 			face,
 		)
-	}
-}
-
-func drawSolidShading(img *image.RGBA, obj *Obj) {
-	rect := img.Bounds()
-	width := rect.Dx()
-	height := rect.Dy()
-
-	lightSource := Vertex{0, 0, -1}
-
-	for _, face := range obj.Faces {
-		screenCoordinates := [3]Point{}
-
-		for i := 0; i < 3; i++ {
-			vertex := face.Vertices[i]
-
-			x := (vertex.X + 1.0) * float64(width) / 2
-			y := (vertex.Y + 1.0) * float64(height) / 2
-
-			screenCoordinates[i].X = int(x)
-			screenCoordinates[i].Y = int(y)
-		}
-
-		faceNormal := face.Normal()
-		faceNormal.normalize(1.0)
-		intensity := faceNormal.X * lightSource.X + faceNormal.Y * lightSource.Y + faceNormal.Z * lightSource.Z
-
-		// Back face culling if the intensity of the light is negative (light is coming from behind the face)
-		if intensity > 0 {
-			drawFilledTriangle(img, screenCoordinates[0], screenCoordinates[1], screenCoordinates[2], color.RGBA{uint8(intensity * 255), uint8(intensity * 255), uint8(intensity * 255), 255})
-		}
-	}
-}
-
-func drawSolid(img *image.RGBA, obj *Obj) {
-	rect := img.Bounds()
-	width := rect.Dx()
-	height := rect.Dy()
-
-	for _, face := range obj.Faces {
-		screenCoordinates := [3]Point{}
-
-		for i := 0; i < 3; i++ {
-			vertex := face.Vertices[i]
-
-			x := (vertex.X + 1.0) * float64(width) / 2
-			y := (vertex.Y + 1.0) * float64(height) / 2
-
-			screenCoordinates[i].X = int(x)
-			screenCoordinates[i].Y = int(y)
-		}
-
-		drawFilledTriangle(img, screenCoordinates[0], screenCoordinates[1], screenCoordinates[2], colors["white"])
-	}
-}
-
-func drawWireframe(img *image.RGBA, obj *Obj) {
-	rect := img.Bounds()
-	width := rect.Dx()
-	height := rect.Dy()
-
-	for _, face := range obj.Faces {
-		for i := 0; i < 3; i++ {
-			fromVertex := face.Vertices[i]
-			toVertex := face.Vertices[(i+1) % 3]
-
-			fromX := (fromVertex.X + 1.0) * float64(width) / 2
-			fromY := (fromVertex.Y + 1.0) * float64(height) / 2
-			toX := (toVertex.X + 1.0) * float64(width) / 2
-			toY := (toVertex.Y + 1.0) * float64(height) / 2
-
-			drawLine(img, int(fromX), int(fromY), int(toX), int(toY), colors["white"])
-		}
 	}
 }

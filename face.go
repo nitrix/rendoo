@@ -1,29 +1,9 @@
 package main
 
 type Face struct {
-	Vertices [3]*Vertex
-	Textures [3]*Vertex
-	Normals [3]*Vertex
-}
-
-func (face *Face) Normal() Vertex {
-	a := Vertex{
-		X: face.Vertices[2].X - face.Vertices[0].X,
-		Y: face.Vertices[2].Y - face.Vertices[0].Y,
-		Z: face.Vertices[2].Z - face.Vertices[0].Z,
-	}
-
-	b := Vertex{
-		X: face.Vertices[1].X - face.Vertices[0].X,
-		Y: face.Vertices[1].Y - face.Vertices[0].Y,
-		Z: face.Vertices[1].Z - face.Vertices[0].Z,
-	}
-
-	return Vertex{
-		X: a.Y * b.Z - a.Z * b.Y,
-		Y: a.Z * b.X - a.X * b.Z,
-		Z: a.X * b.Y - a.Y * b.X,
-	}
+	Vertices [3]Vertex
+	Textures [3]Vertex
+	Normals [3]Vertex
 }
 
 // The trick to Barycentric Coordinates is to find the weights for V1, V2, and V3 that balance the following system of equations:
