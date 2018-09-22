@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/png"
 	"log"
 	"os"
+	"time"
 )
 
 func absInt(n int) int {
@@ -35,7 +37,13 @@ func main() {
 
 	texture = flipImageVertically(texture.Bounds(), texture)
 
-	render(img, obj, texture)
+	now := time.Now()
+	fps := 0
+	for time.Since(now) <= time.Second {
+		render(img, obj, texture)
+		fps++
+	}
+	fmt.Println("FPS:", fps)
 
 	img = flipImageVertically(rect, img)
 	saveImage(img)
