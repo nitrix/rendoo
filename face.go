@@ -3,9 +3,9 @@ package main
 import "image"
 
 type Face struct {
-	Vertices [3]Vertex
-	Textures [3]Vertex
-	Normals [3]Vertex
+	Vertices [3]Vertex4
+	Textures [3]Vertex4
+	Normals [3]Vertex4
 }
 
 // The trick to Barycentric Coordinates is to find the weights for V1, V2, and V3 that balance the following system of equations:
@@ -16,10 +16,10 @@ type Face struct {
 // With a lot of re-arranging, we can solve Wv1, Wv2 and Wv3.
 // Another thing about barycentric coordinates, is that if P is actually outside of the triangle, then at least one of W1, W2, or W3 will be negative!
 func barycentric(pt, p1, p2, p3 image.Point) (float64, float64, float64) {
-	p  := Vertex{X: float64(pt.X), Y: float64(pt.Y)}
-	v1 := Vertex{X: float64(p1.X), Y: float64(p1.Y)}
-	v2 := Vertex{X: float64(p2.X), Y: float64(p2.Y)}
-	v3 := Vertex{X: float64(p3.X), Y: float64(p3.Y)}
+	p  := Vertex4{X: float64(pt.X), Y: float64(pt.Y)}
+	v1 := Vertex4{X: float64(p1.X), Y: float64(p1.Y)}
+	v2 := Vertex4{X: float64(p2.X), Y: float64(p2.Y)}
+	v3 := Vertex4{X: float64(p3.X), Y: float64(p3.Y)}
 
 	weightV1 := ((v2.Y - v3.Y) * (p.X - v3.X) + (v3.X - v2.X) * (p.Y - v3.Y)) / ((v2.Y - v3.Y) * (v1.X - v3.X) + (v3.X - v2.X) * (v1.Y - v3.Y))
 	weightV2 := ((v3.Y - v1.Y) * (p.X - v3.X) + (v1.X - v3.X) * (p.Y - v3.Y)) / ((v2.Y - v3.Y) * (v1.X - v3.X) + (v3.X - v2.X) * (v1.Y - v3.Y))
