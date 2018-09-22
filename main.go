@@ -16,8 +16,8 @@ func absInt(n int) int {
 }
 
 func main() {
-	width, height := 800, 800
-	img := newImage(width, height)
+	rect := image.Rectangle{Max: image.Point{X: 800, Y: 800}}
+	img := newImage(rect)
 
 	obj, err := loadObjFromFile("models/african_head.obj")
 	if err != nil {
@@ -33,9 +33,11 @@ func main() {
 		log.Fatalln("Unable to decode texture:", err)
 	}
 
+	texture = flipImageVertically(texture.Bounds(), texture)
+
 	render(img, obj, texture)
 
-	img = flipImageVertically(img)
+	img = flipImageVertically(rect, img)
 	saveImage(img)
 }
 
