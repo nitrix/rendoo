@@ -1,9 +1,9 @@
-#pragma once
+#ifndef RENDOO_MAIN_H
+#define RENDOO_MAIN_H
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
-#include "SDL.h"
-#include "extra.h"
 
-int main(int argc, char **argv);
+int main(void);
+
+#endif
