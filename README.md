@@ -1,6 +1,10 @@
 # Rendoo
 ###### Software rendering voodoo
 
-Latest progress:
+### What is this?
 
-<img src="output.png" width="800" />
+TODO
+
+### Screenshots
+
+TODO
