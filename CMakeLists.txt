@@ -1,9 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 PROJECT(rendoo)
 
-INCLUDE_DIRECTORIES(
-    include
-)
+ADD_SUBDIRECTORY(lib/toolkit)
 
 ADD_DEFINITIONS(
     -std=c11
@@ -12,4 +10,13 @@ ADD_DEFINITIONS(
     -Werror
 )
 
-ADD_EXECUTABLE(rendoo src/main.c)
+ADD_EXECUTABLE(
+    rendoo
+    src/main.c
+    src/rasterizer.c
+    src/scene.c
+)
+
+TARGET_LINK_LIBRARIES(rendoo toolkit)
+
+TARGET_INCLUDE_DIRECTORIES(rendoo PRIVATE include)

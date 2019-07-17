@@ -1,0 +1,3 @@
+[submodule "lib/toolkit"]
+	path = lib/toolkit
+	url = git@github.com:nitrix/toolkit.git

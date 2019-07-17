@@ -1,9 +1,10 @@
 #ifndef RENDOO_MAIN_H
 #define RENDOO_MAIN_H
 
-#include <stdlib.h>
-#include <stdio.h>
+#include "toolkit.h"
+#include "rasterizer.h"
+#include "scene.h"
 
-int main(void);
+int main(int argc, char *argv[]);
 
 #endif
