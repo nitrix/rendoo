@@ -1,8 +1,8 @@
 #include "main.h"
 
 int main(int argc, char *argv[]) {
-    UNUSED(argc);
-    UNUSED(argv);
+    TK_UNUSED(argc);
+    TK_UNUSED(argv);
 
     printf("Hello World!\n");
 
